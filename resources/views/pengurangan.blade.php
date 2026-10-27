@@ -15,7 +15,7 @@
     <a href="{{ route('perkalian') }}">Perkalian</a>
     <a href="{{ url()->previous() }}">Kembali</a>
 
-    <form action="{{ route('actionPengurangan') }}" method="POST">
+    <form action="{{ route('actionPengurangan') }}" method="post">
         @csrf
         <div class="form-group">
             <label for="">Angka 1</label>

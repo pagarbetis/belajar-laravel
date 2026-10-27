@@ -12,5 +12,9 @@
     <a href="{{ route('bagi') }}">Bagi-bagian</a>
     <a href="{{ route('perkalian') }}">Perkalian</a>
     <a href="{{ url()->previous() }}">Kembali</a>
+
+    <main>
+        @yield('content')
+    </main>
 </body>
 </html>
