@@ -36,6 +36,6 @@
             @enderror
         </div>
         <button type="submit" class="btn-custom btn-custom-primary">Simpan</button>
-        <a href="{{ url()->previous() }}" class="text-muted">Kembali</a>
+        <a href="{{ url()->previous() }}" class="btn-custom btn-custom-warning">Kembali</a>
     </form>
 @endsection
