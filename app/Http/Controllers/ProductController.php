@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -36,34 +37,48 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:60',
-            'slug' => 'nullable|string|max:60|unique:products,slug',
-            'price' => 'required|numeric',
-            'image' => 'nullable|image|mimes:png,jpg,jpeg,gif|max:2048',
-            'brief_description' => 'nullable|string',
-            'description' => 'nullable|string',
-            'price_art_cartoon' => 'nullable|numeric',
-            'price_art_paper' => 'nullable|numeric',
-            'price_hvs' => 'nullable|numeric',
-            'price_doff' => 'nullable|numeric',
-            'price_glossy' => 'nullable|numeric',
-            'price_cutting' => 'nullable|numeric',
-        ]);
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['name']);
-        }
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $validated['image'] = $imagePath;
-        }
-        Product::create($validated);
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'category_id' => 'required|exists:categories,id',
+        'name' => 'required|string|max:60',
+        'slug' => 'nullable|string|max:60|unique:products,slug',
+        'price' => 'required|numeric',
+        'brief_description' => 'nullable|string',
+        'description' => 'nullable|string',
+        'price_art_cartoon' => 'nullable|numeric',
+        'price_art_paper' => 'nullable|numeric',
+        'price_hvs' => 'nullable|numeric',
+        'price_doff' => 'nullable|numeric',
+        'price_glossy' => 'nullable|numeric',
+        'price_cutting' => 'nullable|numeric',
 
-        return redirect()->route('admin.product.index')->with('success', 'Product berhasil ditambahkan!');
+        'images' => 'nullable|array',
+        'images.*' => 'image|mimes:png,jpg,jpeg,webp|max:2048',
+        'alt' => 'nullable|array',
+        'alt.*' => 'nullable|string|max:255',
+    ]);
+
+    if (empty($validated['slug'])) {
+        $validated['slug'] = Str::slug($validated['name']);
     }
+    $product = Product::create($validated);
+    if ($request->hasFile('images')) {
+        $imageData = [];
+        foreach($request->file('images') as $key => $file) {
+            $path = $file->store('products', 'public');
+
+            $imageData[] = [
+                'path' => $path,
+                'alt' => $request->input("alt.{$key}") ?? $product->name,
+                'sort_order' => $key + 1,
+            ];
+        }
+        $product->images()->createMany($imageData);
+    }
+
+    return redirect()->route('admin.product.index')->with('success', 'Product berhasil ditambahkan!');
+}
 
     /**
      * Display the specified resource.

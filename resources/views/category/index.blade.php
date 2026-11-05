@@ -357,11 +357,12 @@
                             <div class="col">
                                 <div
                                     class="card h-100 border rounded-4 overflow-hidden shadow-sm product-card position-relative">
-                                    <span
-                                        class="badge bg-primary position-absolute top-0 start-0 m-3 z-2 px-2 py-1 rounded-pill small">Baru</span>
+                                    {{-- <span
+                                        class="badge bg-primary position-absolute top-0 start-0 m-3 z-2 px-2 py-1 rounded-pill small">Baru</span> --}}
                                     <div class="overflow-hidden bg-light p-4 text-center position-relative d-flex align-items-center justify-content-center"
                                         style="height: 180px;">
-                                        <img src="{{ asset('storage/' .$product->image) }}" alt="" width="100%">
+                                        <img src="{{ asset('storage/' . $product->image) }}" alt=""
+                                            width="100%">
                                     </div>
                                     <div class="card-body p-3 d-flex flex-column">
                                         <div class="text-muted text-uppercase fw-semibold"
@@ -375,7 +376,7 @@
                                             <div class="h6 fw-bold text-danger mb-3">Rp {{ $product->price ?? '' }} <span
                                                     class="fw-normal text-muted small">/ box</span></div>
                                             <a class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-semibold"
-                                                href="detail-produk.html">Lihat Opsi / Order</a>
+                                                href="{{ route('product.show', $product->slug) }}">Lihat Opsi / Order</a>
                                         </div>
                                     </div>
                                 </div>

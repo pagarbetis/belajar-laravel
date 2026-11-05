@@ -35,3 +35,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/category/{slug}', [CatalogController::class, 'category'])->name('category.show');
+Route::get('/product/{slug}', [CatalogController::class, 'product'])->name('product.show');

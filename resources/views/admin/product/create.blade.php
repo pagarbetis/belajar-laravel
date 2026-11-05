@@ -35,7 +35,9 @@
         </div>
         <div class="mb-3">
             <label for="">Deskripsi</label>
-            <textarea name="description" id="editor" cols="30" row="10" class="form-control"></textarea>
+            <textarea name="description" cols="30" rows="10" class="d-none form-control">{{ old('description') }}</textarea>
+        </div>
+        <div id="editor">
         </div>
 
         <div class="row">

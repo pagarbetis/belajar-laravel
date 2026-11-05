@@ -41,7 +41,6 @@ class CategoryController extends Controller
             'sort_order' => 'nullable|string',
             'icon' => 'nullable|string',
         ]);
-
         $validated['slug'] = $validated['slug'] ? Str::slug($validated['slug']) : Str::slug($validated['name']);
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
         Category::create($validated);
