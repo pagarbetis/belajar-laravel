@@ -31,7 +31,7 @@
         </div>
         <div class="mb-3">
             <label for="">Deskripsi Singkat</label>
-            <input type="number" name="brief_description" class="form-control">
+            <input type="text" name="brief_description" class="form-control">
         </div>
         <div class="mb-3">
             <label for="">Deskripsi</label>
