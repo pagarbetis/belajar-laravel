@@ -88,20 +88,16 @@
         </div>
 
         <div class="mb-3">
-            <label for="">Gambar Depan</label>
-            <input type="file" name="image[]" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="">Gambar Belakang</label>
-            <input type="file" name="image[]" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="">Gambar Detail</label>
-            <input type="file" name="image[]" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="">Gambar Kemasan</label>
-            <input type="file" name="image[]" class="form-control">
+            <label class="form-label">Upload Foto Produk</label>
+
+            <div id="image-inputs-container">
+                <div class="input-group mb-2 image-row">
+                    <input type="file" name="images[]" class="form-control" accept="image/*">
+                    <button type="button" class="btn btn-outline-danger remove-input" style="display: none;">Hapus</button>
+                </div>
+            </div>
+
+            <button type="button" id="add-image-btn" class="btn btn-sm btn-secondary mt-1">+ Tambah Kolom Foto</button>
         </div>
         <div class="mb-3">
             <button type="submit" class="btn-custom btn-custom-primary">
@@ -109,6 +105,41 @@
             </button>
             <a href="{{ url()->previous() }}" class="btn-custom btn-custom-warning">Kembali</a>
         </div>
+        <script>
+            document.getElementById('add-image-btn').addEventListener('click', function() {
+                const container = document.getElementById('image-inputs-container');
+
+                const newRow = document.createElement('div');
+                newRow.className = 'input-group mb-2 image-row';
+                newRow.innerHTML = `
+            <input type="file" name="images[]" class="form-control" accept="image/*">
+            <button type="button" class="btn btn-outline-danger remove-input">Hapus</button>
+        `;
+                container.appendChild(newRow);
+
+                updateRemoveButtons();
+            });
+
+            document.getElementById('image-inputs-container').addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('remove-input')) {
+                    e.target.closest('.image-row').remove();
+                    updateRemoveButtons();
+                }
+            });
+
+            function updateRemoveButtons() {
+                const rows = document.querySelectorAll('.image-row');
+                rows.forEach((row, index) => {
+                    const removeBtn = row.querySelector('.remove-input');
+                    if (rows.length === 1) {
+                        removeBtn.style.display = 'none';
+                    } else {
+                        removeBtn.style.display = 'block';
+                    }
+                });
+            }
+        </script>
     </form>
+
 
 @endsection

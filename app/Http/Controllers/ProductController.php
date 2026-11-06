@@ -51,8 +51,9 @@ class ProductController extends Controller
             'price_glossy' => 'nullable|numeric',
             'price_cutting' => 'nullable|numeric',
 
-            'image' => 'nullable|array',
-            'image.*' => 'image|mimes:png,jpg,jpeg,webp|max:2048',
+            // Ubah dari 'image' jadi 'images' biar sinkron sama input multiple
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:png,jpg,jpeg,webp|max:2048',
             'alt' => 'nullable|array',
             'alt.*' => 'nullable|string|max:255',
         ]);
@@ -61,14 +62,12 @@ class ProductController extends Controller
             $validated['slug'] = Str::slug($validated['name']);
         }
 
-        // Kecualikan 'image' dan 'alt' dari create produk
-        $productData = collect($validated)->except(['image', 'alt'])->toArray();
+        $productData = collect($validated)->except(['images', 'alt'])->toArray();
         $product = Product::create($productData);
 
-        // Ambil pakai 'image'
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('images')) {
             $imageData = [];
-            foreach ($request->file('image') as $key => $file) {
+            foreach ($request->file('images') as $key => $file) {
                 $path = $file->store('products', 'public');
 
                 $imageData[] = [
@@ -105,12 +104,18 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         $product = Product::findOrFail($id);
+
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:60',
             'slug' => 'nullable|string|max:60|unique:products,slug,'.$product->id,
             'price' => 'required|numeric',
-            'image' => 'nullable|image|mimes:png,jpg,jpeg,gif|max:2048',
+
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:png,jpg,jpeg,webp|max:2048',
+            'alt' => 'nullable|array',
+            'alt.*' => 'nullable|string|max:255',
+
             'brief_description' => 'nullable|string',
             'description' => 'nullable|string',
             'price_art_cartoon' => 'nullable|numeric',
@@ -124,14 +129,23 @@ class ProductController extends Controller
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
         }
-        if ($request->hasFile('image')) {
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
-                Storage::disk('public')->delete($product->image);
-            }
 
-            $validated['image'] = $request->file('image')->store('products', 'public');
+        $productData = collect($validated)->except(['images', 'alt'])->toArray();
+        $product->update($productData);
+
+        if ($request->hasFile('images')) {
+            $imageData = [];
+            foreach ($request->file('images') as $key => $file) {
+                $path = $file->store('products', 'public');
+
+                $imageData[] = [
+                    'path' => $path,
+                    'alt' => $request->input("alt.{$key}") ?? $product->name,
+                    'sort_order' => $product->images()->count() + $key + 1,
+                ];
+            }
+            $product->images()->createMany($imageData);
         }
-        $product->update($validated);
 
         return redirect()->route('admin.product.index')->with('success', 'Product berhasil diupdate!');
     }
