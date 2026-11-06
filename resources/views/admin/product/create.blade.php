@@ -88,8 +88,20 @@
         </div>
 
         <div class="mb-3">
-            <label for="">Gambar</label>
-            <input type="file" name="image" class="form-control">
+            <label for="">Gambar Depan</label>
+            <input type="file" name="image[]" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="">Gambar Belakang</label>
+            <input type="file" name="image[]" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="">Gambar Detail</label>
+            <input type="file" name="image[]" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="">Gambar Kemasan</label>
+            <input type="file" name="image[]" class="form-control">
         </div>
         <div class="mb-3">
             <button type="submit" class="btn-custom btn-custom-primary">

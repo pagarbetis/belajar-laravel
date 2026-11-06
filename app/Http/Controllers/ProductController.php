@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -17,8 +16,7 @@ class ProductController extends Controller
     public function index()
     {
         $title = 'Managemen Produk || PPKD Sticker';
-        $products = Product::with('category')->get();
-        // $category = Category::with('products')->count();
+        $products = Product::with(['category', 'images'])->get();
 
         return view('admin.product.index', compact('title', 'products'));
     }
@@ -37,48 +35,53 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-public function store(Request $request)
-{
-    $validated = $request->validate([
-        'category_id' => 'required|exists:categories,id',
-        'name' => 'required|string|max:60',
-        'slug' => 'nullable|string|max:60|unique:products,slug',
-        'price' => 'required|numeric',
-        'brief_description' => 'nullable|string',
-        'description' => 'nullable|string',
-        'price_art_cartoon' => 'nullable|numeric',
-        'price_art_paper' => 'nullable|numeric',
-        'price_hvs' => 'nullable|numeric',
-        'price_doff' => 'nullable|numeric',
-        'price_glossy' => 'nullable|numeric',
-        'price_cutting' => 'nullable|numeric',
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:60',
+            'slug' => 'nullable|string|max:60|unique:products,slug',
+            'price' => 'required|numeric',
+            'brief_description' => 'nullable|string',
+            'description' => 'nullable|string',
+            'price_art_cartoon' => 'nullable|numeric',
+            'price_art_paper' => 'nullable|numeric',
+            'price_hvs' => 'nullable|numeric',
+            'price_doff' => 'nullable|numeric',
+            'price_glossy' => 'nullable|numeric',
+            'price_cutting' => 'nullable|numeric',
 
-        'images' => 'nullable|array',
-        'images.*' => 'image|mimes:png,jpg,jpeg,webp|max:2048',
-        'alt' => 'nullable|array',
-        'alt.*' => 'nullable|string|max:255',
-    ]);
+            'image' => 'nullable|array',
+            'image.*' => 'image|mimes:png,jpg,jpeg,webp|max:2048',
+            'alt' => 'nullable|array',
+            'alt.*' => 'nullable|string|max:255',
+        ]);
 
-    if (empty($validated['slug'])) {
-        $validated['slug'] = Str::slug($validated['name']);
-    }
-    $product = Product::create($validated);
-    if ($request->hasFile('images')) {
-        $imageData = [];
-        foreach($request->file('images') as $key => $file) {
-            $path = $file->store('products', 'public');
-
-            $imageData[] = [
-                'path' => $path,
-                'alt' => $request->input("alt.{$key}") ?? $product->name,
-                'sort_order' => $key + 1,
-            ];
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['name']);
         }
-        $product->images()->createMany($imageData);
-    }
 
-    return redirect()->route('admin.product.index')->with('success', 'Product berhasil ditambahkan!');
-}
+        // Kecualikan 'image' dan 'alt' dari create produk
+        $productData = collect($validated)->except(['image', 'alt'])->toArray();
+        $product = Product::create($productData);
+
+        // Ambil pakai 'image'
+        if ($request->hasFile('image')) {
+            $imageData = [];
+            foreach ($request->file('image') as $key => $file) {
+                $path = $file->store('products', 'public');
+
+                $imageData[] = [
+                    'path' => $path,
+                    'alt' => $request->input("alt.{$key}") ?? $product->name,
+                    'sort_order' => $key + 1,
+                ];
+            }
+            $product->images()->createMany($imageData);
+        }
+
+        return redirect()->route('admin.product.index')->with('success', 'Product berhasil ditambahkan!');
+    }
 
     /**
      * Display the specified resource.
@@ -115,8 +118,7 @@ public function store(Request $request)
             'price_hvs' => 'nullable|numeric',
             'price_doff' => 'nullable|numeric',
             'price_glossy' => 'nullable|numeric',
-            'price_cutting' => 'nullable|numeric',
-            'price_no_cutting' => 'nullable|numeric',
+            'cutting_price' => 'nullable|numeric',
         ]);
 
         if (empty($validated['slug'])) {
@@ -127,7 +129,6 @@ public function store(Request $request)
                 Storage::disk('public')->delete($product->image);
             }
 
-            // Upload gambar baru
             $validated['image'] = $request->file('image')->store('products', 'public');
         }
         $product->update($validated);

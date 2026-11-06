@@ -9,15 +9,16 @@ class CatalogController extends Controller
 {
     public function category(string $slug)
     {
-        $category = Category::with('products')->where('slug', $slug)->first();
-        $products = $category->products()->paginate(10);
+        $category = Category::where('slug', $slug)->firstOrFail();
+        
+        $products = $category->products()->with('images')->paginate(10);
 
         return view('category.index', compact('products', 'category'));
     }
 
     public function product(string $slug)
     {
-        $product = Product::where('slug', $slug)->first();
+        $product = Product::with('images')->where('slug', $slug)->firstOrFail();
 
         return view('product.index', compact('product'));
     }

@@ -24,8 +24,13 @@
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>
-                            @if ($item->image !== null)
-                                <img src="{{ asset('storage/' . $item->image) }}" width="100" alt="{{ $item->name ?? '' }}">
+                            @php
+                                $firstImage = $item->images->first();
+                            @endphp
+
+                            @if ($firstImage)
+                                <img src="{{ asset('storage/' . $firstImage->path) }}" width="100"
+                                    alt="{{ $item->name ?? '' }}">
                             @else
                                 <span class="text-muted">Gambar Tidak Ditemukan</span>
                             @endif

@@ -361,8 +361,16 @@
                                         class="badge bg-primary position-absolute top-0 start-0 m-3 z-2 px-2 py-1 rounded-pill small">Baru</span> --}}
                                     <div class="overflow-hidden bg-light p-4 text-center position-relative d-flex align-items-center justify-content-center"
                                         style="height: 180px;">
-                                        <img src="{{ asset('storage/' . $product->image) }}" alt=""
-                                            width="100%">
+                                        @php
+                                            $firstImage = $product->images->first();
+                                        @endphp
+
+                                        @if ($firstImage)
+                                            <img src="{{ asset('storage/' . $firstImage->path) }}"
+                                                alt="{{ $product->name ?? '' }}" width="100%">
+                                        @else
+                                            <span class="text-muted small">Gambar Tidak Ditemukan</span>
+                                        @endif
                                     </div>
                                     <div class="card-body p-3 d-flex flex-column">
                                         <div class="text-muted text-uppercase fw-semibold"

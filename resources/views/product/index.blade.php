@@ -41,19 +41,22 @@
                             </div>
                             <!-- Realistic 3D Card Mockup with Spot UV / Foil visual simulation -->
                             <div class="mb-3 text-center">
-                                @if ($product->image)
+                                @php
+                                    $firstImage = $product->images->first();
+                                @endphp
+
+                                @if ($firstImage)
                                     <div class="card shadow-sm border-0 d-inline-block p-2 bg-white rounded-3">
-                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                                            class="img-fluid rounded-3" style="max-height: 250px; object-fit: cover;">
+                                        <img id="mainProductImage" src="{{ asset('storage/' . $firstImage->path) }}"
+                                            alt="{{ $product->name }}" class="img-fluid rounded-3"
+                                            style="max-height: 250px; object-fit: cover;">
                                     </div>
                                 @else
                                     <div class="text-muted fst-italic py-3 border rounded bg-light">
-                                        <i class="bi bi-image text-muted fs-4 d-block mb-1"></i>
                                         Gambar produk tidak ditemukan
                                     </div>
                                 @endif
                             </div>
-                            <!-- Hint text beneath interactive preview -->
                             {{-- <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2 text-muted small d-flex align-items-center gap-1"
                                 style="font-size: 0.75rem;">
                                 <i class="bi bi-zoom-in text-primary"></i> Preview interaktif finishing Spot UV &amp; Foil
@@ -63,43 +66,55 @@
                     </div>
                     <!-- Thumbnail Carousel / Selector -->
                     <div class="row g-2 mb-4">
-                        <div class="col-3">
-                            <button
-                                class="btn p-1 w-100 border border-2 border-primary rounded-3 bg-white text-center shadow-xs"
-                                onclick="selectThumbnail(this, 'depan')" type="button">
-                                <div class="bg-dark rounded-2 py-3 text-warning fw-bold small text-truncate"
-                                    style="font-size: 0.7rem;">
-                                    <i class="bi bi-card-heading d-block fs-6 mb-1 text-white"></i>Tampak Depan
+                        @php
+                            $slots = [
+                                [
+                                    'label' => 'Tampak Depan',
+                                    'icon' => 'bi-card-heading',
+                                    'bg' => 'bg-dark text-warning',
+                                    'icon-color' => 'text-white',
+                                ],
+                                [
+                                    'label' => 'Tampak Belakang',
+                                    'icon' => 'bi-credit-card-2-back',
+                                    'bg' => 'bg-secondary bg-opacity-25 text-dark',
+                                    'icon-color' => 'text-primary',
+                                ],
+                                [
+                                    'label' => 'Detail Foil UV',
+                                    'icon' => 'bi-stars',
+                                    'bg' => 'bg-warning bg-opacity-25 text-dark',
+                                    'icon-color' => 'text-warning',
+                                ],
+                                [
+                                    'label' => 'Box Kemasan',
+                                    'icon' => 'bi-box-seam',
+                                    'bg' => 'bg-light text-dark',
+                                    'icon-color' => 'text-success',
+                                ],
+                            ];
+                        @endphp
+
+                        @foreach ($slots as $index => $slot)
+                            @php
+                                $img = $product->images[$index] ?? null;
+                            @endphp
+
+                            @if ($img)
+                                <div class="col-3">
+                                    <button
+                                        class="btn p-1 w-100 border rounded-3 bg-white text-center {{ $index === 0 ? 'border-2 border-primary shadow-xs' : 'opacity-75' }} thumb-btn"
+                                        onclick="changeMainImage('{{ asset('storage/' . $img->path) }}', this)"
+                                        type="button">
+                                        <div class="{{ $slot['bg'] }} rounded-2 py-3 fw-bold small text-truncate"
+                                            style="font-size: 0.7rem;">
+                                            <i
+                                                class="{{ $slot['icon'] }} d-block fs-6 mb-1 {{ $slot['icon-color'] }}"></i>{{ $slot['label'] }}
+                                        </div>
+                                    </button>
                                 </div>
-                            </button>
-                        </div>
-                        <div class="col-3">
-                            <button class="btn p-1 w-100 border rounded-3 bg-white text-center opacity-75"
-                                onclick="selectThumbnail(this, 'belakang')" type="button">
-                                <div class="bg-secondary bg-opacity-25 rounded-2 py-3 text-dark fw-bold small text-truncate"
-                                    style="font-size: 0.7rem;">
-                                    <i class="bi bi-credit-card-2-back d-block fs-6 mb-1 text-primary"></i>Tampak Belakang
-                                </div>
-                            </button>
-                        </div>
-                        <div class="col-3">
-                            <button class="btn p-1 w-100 border rounded-3 bg-white text-center opacity-75"
-                                onclick="selectThumbnail(this, 'tekstur')" type="button">
-                                <div class="bg-warning bg-opacity-25 rounded-2 py-3 text-dark fw-bold small text-truncate"
-                                    style="font-size: 0.7rem;">
-                                    <i class="bi bi-stars d-block fs-6 mb-1 text-warning"></i>Detail Foil UV
-                                </div>
-                            </button>
-                        </div>
-                        <div class="col-3">
-                            <button class="btn p-1 w-100 border rounded-3 bg-white text-center opacity-75"
-                                onclick="selectThumbnail(this, 'packaging')" type="button">
-                                <div class="bg-light rounded-2 py-3 text-dark fw-bold small text-truncate"
-                                    style="font-size: 0.7rem;">
-                                    <i class="bi bi-box-seam d-block fs-6 mb-1 text-success"></i>Box Kemasan
-                                </div>
-                            </button>
-                        </div>
+                            @endif
+                        @endforeach
                     </div>
                     <!-- Tab Informasi Produk -->
                     <div class="card border rounded-4 shadow-sm bg-white overflow-hidden mb-4">
@@ -254,8 +269,7 @@
                             <span
                                 class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 small fw-semibold">Produk
                                 Unggulan</span>
-                            <span class="text-muted small">SKU: <span
-                                    class="fw-semibold text-dark">NC-PREM-01</span></span>
+                            <span class="text-muted small">SKU: <span class="fw-semibold text-dark">NC-PREM-01</span></span>
                         </div>
                         <h1 class="h3 fw-extrabold text-dark mb-2">Kartu Nama Premium Spot UV &amp; Foil Digital</h1>
                         <div class="d-flex align-items-center gap-2 mb-3">
@@ -532,5 +546,20 @@
             </div>
         </div>
         <!-- Interactive JavaScript Calculator & Thumbnail Switcher -->
+        <script>
+            function changeMainImage(imagePath, buttonElement) {
+                const mainImg = document.getElementById('mainProductImage');
+                if (mainImg) {
+                    mainImg.src = imagePath;
+                }
+
+                document.querySelectorAll('.thumb-btn').forEach(btn => {
+                    btn.classList.remove('border-2', 'border-primary', 'shadow-xs');
+                    btn.classList.add('opacity-75');
+                });
+                buttonElement.classList.remove('opacity-75');
+                buttonElement.classList.add('border-2', 'border-primary', 'shadow-xs');
+            }
+        </script>
     </div>
 @endsection
