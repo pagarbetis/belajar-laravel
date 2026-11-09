@@ -13,5 +13,6 @@ class Setting extends Model
             'label',
             'group',
             'type',
+            'email_order',
         ];
 }

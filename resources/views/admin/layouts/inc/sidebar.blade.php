@@ -58,6 +58,20 @@
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
+                        <a href="{{ route('admin.category_blog.index') }}" class="sidebar-menu-link" id="menu-blankpage"
+                            title="Blank Page">
+                            <i class="bi bi-file-earmark"></i>
+                            <span>Kategori Blog</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="{{ route('admin.blog.index') }}" class="sidebar-menu-link" id="menu-blankpage"
+                            title="Blank Page">
+                            <i class="bi bi-file-earmark"></i>
+                            <span>Blog</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
                         <a href="{{ route('admin.user.index') }}" class="sidebar-menu-link" id="menu-loginpage"
                             title="Login Page">
                             <i class="bi bi-people"></i>
@@ -65,12 +79,12 @@
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
-                    <a href="{{ route('admin.product.index') }}" class="sidebar-menu-link" id="menu-loginpage"
-                        title="Login Page">
-                        <i class="bi bi-people"></i>
-                        <span>Product</span>
-                    </a>
-                </li>
+                        <a href="{{ route('admin.product.index') }}" class="sidebar-menu-link" id="menu-loginpage"
+                            title="Login Page">
+                            <i class="bi bi-people"></i>
+                            <span>Product</span>
+                        </a>
+                    </li>
                     <li class="sidebar-menu-item">
                         <a href="{{ route('admin.settings') }}" class="sidebar-menu-link" id="menu-404"
                             title="404 Page">
@@ -89,7 +103,7 @@
                 onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop'">
             <div class="sidebar-profile-info">
                 <div class="sidebar-profile-name">{{ auth()->user()->name ?? '' }}</div>
-                <div class="sidebar-profile-email">admin@email.com</div>
+                <div class="sidebar-profile-email">{{ auth()->user()->email ?? '' }}</div>
             </div>
         </div>
     </div>
