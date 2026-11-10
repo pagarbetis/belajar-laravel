@@ -64,22 +64,22 @@
         <!-- END: Page Header Banner -->
 
         <!-- START: Blank Page Content Area -->
-        @if (session('success'))
-            <div class="alert alert-success mb-3">
+        {{-- @if (session('success'))
+            <div id="flash-message" class="alert alert-success mb-3">
                 <i class="bi bi-check-circle-fill me-2"></i>
                 <strong>Success</strong> {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
         @if (session('error'))
-            <div class="alert alert-warning mb-3">
+            <div id="flash-message" class="alert alert-warning mb-3">
                 <i class="bi bi-exclamation-circle-fill me-2"></i>
                 <strong>Error</strong> {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
         @if ($errors->any())
-            <div class="alert alert-warning mb-3">
+            <div id="flash-message" class="alert alert-warning mb-3">
                 <i class="bi bi-exclamation-circle-fill me-2"></i>
                 <strong>Peringatan:</strong> Terdapat beberapa kesalahan pengisian form:
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -89,7 +89,7 @@
                     @endforeach
                 </ul>
             </div>
-        @endif
+        @endif --}}
 
         <div class="card p-4 border-light shadow-sm">
             @yield('content')
@@ -125,14 +125,60 @@
     {{-- quill --}}
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script>
-        const quill = new Quill('#editor', {
-            theme: 'snow'
-        });
+        const editorEl = document.querySelector('#editor');
 
-        quill.on('text-change', function(delta, oldDelta, source) {
-            document.querySelector("textarea[name='description']").value = quill.root.innerHTML;
+        if (editorEl) {
+            const quill = new Quill('#editor', {
+                theme: 'snow'
+            });
+
+            let initialContent = editorEl.getAttribute('data-old');
+            if (initialContent) {
+                quill.root.innerHTML = initialContent;
+            }
+
+            let activeTextarea = document.querySelector("textarea[name='content']") || document.querySelector(
+                "textarea[name='description']");
+
+            quill.on('text-change', function(delta, oldDelta, source) {
+                if (source === 'user' && activeTextarea) {
+                    activeTextarea.value = quill.root.innerHTML;
+                }
+            });
+        }
+    </script>
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessage = document.getElementById('flash-message');
+
+            if (flashMessage) {
+
+                setTimeout(function() {
+
+                    flashMessage.classList.remove('show');
+
+                    setTimeout(function() {
+                        flashMessage.remove();
+                    }, 300);
+
+                }, 3000);
+            }
+        });
+    </script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @if (session('success'))
+    <script>
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: "{{ session('success') }}",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
         });
     </script>
+@endif
 
     <!-- Local dashboard interactions controller -->
     <script src="{{ asset('assets/js/dashboard.js') }}"></script>

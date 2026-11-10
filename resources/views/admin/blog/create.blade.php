@@ -47,10 +47,13 @@
 
         <div class="mb-3">
             <label for="" class="form-label-custom">Konten</label>
-            <textarea name="content" class="form-control" rows="6" required>{{ old('content', $blog->content ?? '') }}</textarea>
+            <textarea name="content" class="d-none form-control" rows="6" required>{{ old('content', $blog->content ?? '') }}</textarea>
             @error('content')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
             @enderror
+        </div>
+        <div id="editor">
+
         </div>
 
         <div class="mb-3">

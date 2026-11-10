@@ -85,12 +85,12 @@ class BlogController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string',
-            'blog_category_id' => 'required|exists:category_blog,id',
+            'blog_category_id' => 'required|exists:category_blogs,id',
             'brief_description' => 'nullable|string',
-            'slug' => 'nullable|string|unique:category_blogs,slug,',
+            'slug' => 'nullable|string|unique:category_blogs,slug,id',
             'content' => 'nullable|string',
             'author' => 'nullable|string',
-            'cover_path' => 'image|mimes:png,jpg,jpeg,webp|max:2048',
+            'cover_path' => 'nullable|image|mimes:png,jpg,jpeg,webp,jfif|max:2048',
         ]);
 
         if ($request->hasFile('cover_path')) {
@@ -99,9 +99,14 @@ class BlogController extends Controller
             }
         }
 
-        $valdiated['slug'] = $validated['slug'] ? Str::slug($validated['slug']) : Str::slug($validated['name']);
+        if (empty($request->slug)) {
+            $validated['slug'] = Str::slug($validated['name']);
+        } else {
+            $validated['slug'] = Str::slug($request->slug);
+        }
 
-        Blog::update($validated);
+     
+        $blog->update($validated);
 
         return redirect()->route('admin.blog.index')->with('success', 'Blog berhasil diubah!');
     }
