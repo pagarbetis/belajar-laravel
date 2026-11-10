@@ -118,7 +118,6 @@
                                         <span aria-hidden="true">·</span>
                                     </div>
                                     <h2 class="h6 fw-bold mb-2 lh-sm">
-                                        <!-- Perbaikan: href judul pakai route dynamic slug -->
                                         <a class="text-dark text-decoration-none stretched-link-title"
                                             href="{{ route('blog.show', $blog->slug) }}">{{ $blog->name }}</a>
                                     </h2>
