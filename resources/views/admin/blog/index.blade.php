@@ -18,6 +18,7 @@
                     <th>Nama</th>
                     <th>Nama Kategori</th>
                     <th>Slug Url</th>
+                    <th>Deskripsi Singkat</th>
                     <th>Penulis</th>
                     <th>Aksi</th>
                 </tr>
@@ -26,11 +27,13 @@
                 @foreach ($blogs as $key => $data)
                     <tr>
                         <td>{{ $key += 1 }}</td>
-                        <td><img src="{{ asset('storage/' . $data->cover_path ?? '') }}" alt="Cover Blog" width="100" class="rounded" style="object-fit: cover;" ></td>
+                        <td><img src="{{ asset('storage/' . $data->cover_path ?? '') }}" alt="Cover Blog" width="100"
+                                class="rounded" style="object-fit: cover;"></td>
                         <td>{{ $data->name ?? '' }}</td>
                         <td>{{ $data->category->name ?? '' }}</td>
                         <td>{{ $data->slug ?? '' }}</td>
                         <td>{{ $data->brief_description ?? '' }}</td>
+                        <td>{{ $data->author ?? '' }}</td>
                         <td>
                             <a class="table-btn-action" title="Edit" href="{{ route('admin.blog.edit', $data->id) }}">
                                 <i class="bi bi-pencil"></i>

@@ -105,7 +105,7 @@ class BlogController extends Controller
             $validated['slug'] = Str::slug($request->slug);
         }
 
-     
+        return $validated;
         $blog->update($validated);
 
         return redirect()->route('admin.blog.index')->with('success', 'Blog berhasil diubah!');

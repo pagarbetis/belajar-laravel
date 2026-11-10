@@ -52,3 +52,4 @@ Route::get('/product/{slug}', [CatalogController::class, 'product'])->name('prod
 Route::get('faq', [PageController::class, 'faq'])->name('faq.index');
 Route::get('contact', [PageController::class, 'contact'])->name('contact.index');
 Route::get('blog', [PageController::class, 'blog'])->name('blog.index');
+Route::get('/blog/{slug}', [PageController::class, 'showBlog'])->name('blog.show');

@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Blog;
 use App\Models\Setting;
+use App\Models\CategoryBlog;
 
 class PageController extends Controller
 {
@@ -13,16 +16,23 @@ class PageController extends Controller
     public function contact()
     {
         $setting = Setting::get();
+
         return view('contact.index', compact('setting'));
     }
 
     public function blog()
     {
-        return view('blog.index');
+        $categories = CategoryBlog::withCount('blogs')->get();
+        $totalBlogsCount = Blog::count();
+        $latestBlog = Blog::latest()->first();
+        $blogs = Blog::latest()->skip(1)->take(6)->get();
+
+        return view('blog.index', compact('latestBlog', 'blogs', 'totalBlogsCount', 'categories'));
     }
 
-    public function showBlog(string $id)
+    public function showBlog($slug)
     {
-        return view('blog.show');
+        $blog = Blog::where('slug', $slug)->firstOrFail();
+        return view('blog.show', compact('blog'));
     }
 }

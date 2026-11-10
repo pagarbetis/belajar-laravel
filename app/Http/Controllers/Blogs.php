@@ -61,7 +61,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        $title = 'Edit Kateori || PPKD Sticker';
+        $title = 'Edit Kategori || PPKD Sticker';
 
         return view('admin.category.edit', compact('title', 'category'));
     }
