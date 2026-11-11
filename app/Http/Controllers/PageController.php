@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
-use App\Models\Setting;
 use App\Models\CategoryBlog;
+use App\Models\Setting;
 
 class PageController extends Controller
 {
@@ -32,7 +32,17 @@ class PageController extends Controller
 
     public function showBlog($slug)
     {
-        $blog = Blog::where('slug', $slug)->firstOrFail();
-        return view('blog.show', compact('blog'));
+        $blog = Blog::with('category')->where('slug', $slug)->firstOrFail();
+
+        $previousBlog = Blog::where('id', '<', $blog->id)->latest('id')->first();
+        $nextBlog = Blog::where('id', '>', $blog->id)->oldest('id')->first();
+        $relatedBlogs = Blog::with('category')
+            ->where('blog_category_id', $blog->blog_category_id)
+            ->where('id', '!=', $blog->id)
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('blog.show', compact('blog', 'previousBlog', 'nextBlog', 'relatedBlogs'));
     }
 }

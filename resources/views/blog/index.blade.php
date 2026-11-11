@@ -153,7 +153,7 @@
                         </div>
                         <div class="col-lg-4 text-lg-end d-flex flex-wrap gap-2 justify-content-lg-end">
                             <a class="btn btn-pg-primary rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm"
-                                href="katalog.html">
+                                href="{{ route('product.index') }}">
                                 <i class="bi bi-grid"></i> Lihat produk
                             </a>
                             <a class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2"
@@ -166,67 +166,64 @@
             </div>
         </section>
     </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('blogSearchInput');
-        const filterButtons = document.querySelectorAll('.pill-filter-btn');
-        const blogCards = document.querySelectorAll('#blogGrid .col');
-        const featuredCard = document.querySelector('.blog-featured');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('blogSearchInput');
+            const filterButtons = document.querySelectorAll('.pill-filter-btn');
+            const blogCards = document.querySelectorAll('#blogGrid .col');
+            const featuredCard = document.querySelector('.blog-featured');
 
-        let currentCategory = 'all';
-        let currentKeyword = '';
+            let currentCategory = 'all';
+            let currentKeyword = '';
 
-        function applyFilter() {
-            if (featuredCard) {
-                const fCategory = featuredCard.getAttribute('data-category')?.toLowerCase() || '';
-                const fTitle = featuredCard.querySelector('h2 a')?.textContent.toLowerCase() || '';
-                const fExcerpt = featuredCard.querySelector('p')?.textContent.toLowerCase() || '';
+            function applyFilter() {
+                if (featuredCard) {
+                    const fCategory = featuredCard.getAttribute('data-category')?.toLowerCase() || '';
+                    const fTitle = featuredCard.querySelector('h2 a')?.textContent.toLowerCase() || '';
 
-                const matchesCategory = (currentCategory === 'all' || fCategory === currentCategory);
-                const matchesKeyword = (fTitle.includes(currentKeyword) || fExcerpt.includes(currentKeyword));
+                    const matchesCategory = (currentCategory === 'all' || fCategory === currentCategory);
+                    const matchesKeyword = fTitle.includes(currentKeyword);
 
-                if (matchesCategory && matchesKeyword) {
-                    featuredCard.style.display = '';
-                } else {
-                    featuredCard.style.display = 'none';
+                    if (matchesCategory && matchesKeyword) {
+                        featuredCard.style.display = '';
+                    } else {
+                        featuredCard.style.display = 'none';
+                    }
                 }
+
+                blogCards.forEach(function(card) {
+                    const cardCategory = card.getAttribute('data-category')?.toLowerCase() || '';
+                    const titleElement = card.querySelector('h2 a');
+
+                    const title = titleElement ? titleElement.textContent.toLowerCase() : '';
+
+                    const matchesCategory = (currentCategory === 'all' || cardCategory === currentCategory);
+                    const matchesKeyword = title.includes(currentKeyword);
+
+                    if (matchesCategory && matchesKeyword) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
             }
 
-            blogCards.forEach(function(card) {
-                const cardCategory = card.getAttribute('data-category')?.toLowerCase() || '';
-                const titleElement = card.querySelector('h2 a');
-                const excerptElement = card.querySelector('p');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    currentKeyword = searchInput.value.toLowerCase().trim();
+                    applyFilter();
+                });
+            }
 
-                const title = titleElement ? titleElement.textContent.toLowerCase() : '';
-                const excerpt = excerptElement ? excerptElement.textContent.toLowerCase() : '';
+            filterButtons.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
 
-                const matchesCategory = (currentCategory === 'all' || cardCategory === currentCategory);
-                const matchesKeyword = (title.includes(currentKeyword) || excerpt.includes(currentKeyword));
-
-                if (matchesCategory && matchesKeyword) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        if (searchInput) {
-            searchInput.addEventListener('keyup', function() {
-                currentKeyword = searchInput.value.toLowerCase().trim();
-                applyFilter();
-            });
-        }
-
-        filterButtons.forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                filterButtons.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-
-                currentCategory = this.getAttribute('data-blog-filter')?.toLowerCase() || 'all';
-                applyFilter();
+                    currentCategory = this.getAttribute('data-blog-filter')?.toLowerCase() || 'all';
+                    applyFilter();
+                });
             });
         });
-    });
-</script>
+    </script>
 @endsection

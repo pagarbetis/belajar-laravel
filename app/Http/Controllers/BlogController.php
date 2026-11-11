@@ -41,14 +41,16 @@ class BlogController extends Controller
             'name' => 'required|string',
             'blog_category_id' => 'required|exists:category_blogs,id',
             'brief_description' => 'nullable|string',
-            'slug' => 'nullable|string|unique:blogs,slug,',
+            'slug' => 'nullable|string|unique:blogs,slug',
             'content' => 'nullable|string',
             'author' => 'nullable|string',
-            'cover_path' => 'image|mimes:png,jpg,jpeg,webp|max:2048',
+            'cover_path' => 'nullable|image|mimes:png,jpg,jpeg,webp,jfif|max:2048',
         ]);
 
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
+        } else {
+            $validated['slug'] = Str::slug($validated['slug']);
         }
 
         if ($request->hasFile('cover_path')) {
@@ -74,8 +76,9 @@ class BlogController extends Controller
     public function edit(Blog $blog)
     {
         $title = 'Ubah Blog || PPKD Sticker';
+        $categories = CategoryBlog::get(); 
 
-        return view('admin.blog.edit', compact('blog', 'title'));
+        return view('admin.blog.edit', compact('blog', 'title', 'categories'));
     }
 
     /**
@@ -87,16 +90,17 @@ class BlogController extends Controller
             'name' => 'required|string',
             'blog_category_id' => 'required|exists:category_blogs,id',
             'brief_description' => 'nullable|string',
-            'slug' => 'nullable|string|unique:category_blogs,slug,id',
+            'slug' => 'nullable|string|unique:blogs,slug,' . $blog->id,
             'content' => 'nullable|string',
             'author' => 'nullable|string',
             'cover_path' => 'nullable|image|mimes:png,jpg,jpeg,webp,jfif|max:2048',
         ]);
 
         if ($request->hasFile('cover_path')) {
-            if ($blog->cover_path) {
+            if ($blog->cover_path && Storage::disk('public')->exists($blog->cover_path)) {
                 Storage::disk('public')->delete($blog->cover_path);
             }
+            $validated['cover_path'] = $request->file('cover_path')->store('blogs', 'public');
         }
 
         if (empty($request->slug)) {
@@ -105,7 +109,7 @@ class BlogController extends Controller
             $validated['slug'] = Str::slug($request->slug);
         }
 
-        return $validated;
+
         $blog->update($validated);
 
         return redirect()->route('admin.blog.index')->with('success', 'Blog berhasil diubah!');
@@ -116,11 +120,10 @@ class BlogController extends Controller
      */
     public function destroy(string $id)
     {
-        $blog = Blog::find($id);
+        $blog = Blog::findorfail($id);
 
-        // Diperbaiki dari $product->img menjadi $product->image
-        if ($blog->image && Storage::disk('public')->exists($blog->image)) {
-            Storage::disk('public')->delete($blog->image);
+        if ($blog->cover_path && Storage::disk('public')->exists($blog->cover_path)) {
+            Storage::disk('public')->delete($blog->cover_path);
         }
 
         $blog->delete();
